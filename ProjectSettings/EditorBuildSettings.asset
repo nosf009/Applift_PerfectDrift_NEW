@@ -12,9 +12,9 @@ EditorBuildSettings:
     path: Assets/_HCFW/___Scenes/HcGame/_HcGame_OLD.unity
     guid: 5ca2c67c6bde877448c04f36cf9a2bfa
   - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 1
     path: Assets/_HCFW/___Scenes/HcGame/_HcGame Romano.unity
     guid: f597bc8a0c93e2d4f877b5b283014bce
+  - enabled: 1
+    path: Assets/_HCFW/___Scenes/HcGame/_HcGame.unity
+    guid: 20057d4622e9bf54c8d2141ecd0d4c21
   m_configObjects: {}
