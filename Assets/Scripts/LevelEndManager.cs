@@ -45,7 +45,7 @@ public class LevelEndManager : MonoBehaviour
     {
 
         // generating the green position and the others, either left or right
-        if(UnityEngine.Random.value < 0.5f)
+        if (UnityEngine.Random.value < 0.5f)
         {
             HCFW.GameManager.Instance.MenuManager.PickGreenPosition(true);
         }
@@ -60,7 +60,7 @@ public class LevelEndManager : MonoBehaviour
     public IEnumerator StartEOL(SteerArea pickedSteerArea)
     {
 
-        Debug.Log("::<Color=White> Player picked " + pickedSteerArea.ToString() +  " ::</color>");
+        Debug.Log("::<Color=White> Player picked " + pickedSteerArea.ToString() + " ::</color>");
         /*
         // do something with according to picked steer area
         /////////////////////////////////////////////////
@@ -79,6 +79,8 @@ public class LevelEndManager : MonoBehaviour
         }
         ////////////////////////////////////////////////
         */
+
+        HCFW.GameManager.Instance.MenuManager.eolTextEnd.DOColor(Color.clear, .5F).SetDelay(2.5F);
         dampen = 15f;
         CanvasGroup cgGameView = HCFW.GameManager.Instance.MenuManager.gameView.gameObject.AddComponent<CanvasGroup>();
         cgGameView.alpha = 1f;
@@ -89,6 +91,7 @@ public class LevelEndManager : MonoBehaviour
         DOTween.To(() => GameManager.Instance.vcc.smoothFollowSettings.distance, x => GameManager.Instance.vcc.smoothFollowSettings.distance = x, 55f, 2f).SetUpdate(true);
         DOTween.To(() => GameManager.Instance.vcc.smoothFollowSettings.height, x => GameManager.Instance.vcc.smoothFollowSettings.height = x, 25f, 2f).SetUpdate(true);
         yield return new WaitForSecondsRealtime(GameManager.Instance.firstEOLDelay);
+
         Transform moveEnd = GameObject.FindGameObjectWithTag("EndCam").transform;
         yield return new WaitForSecondsRealtime(1f);
         GameManager.Instance.vcc.enabled = false;
