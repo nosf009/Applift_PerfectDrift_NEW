@@ -60,6 +60,7 @@ public class LevelEndManager : MonoBehaviour
     {
 
         Debug.Log("::<Color=White> Player picked " + pickedSteerArea.ToString() +  " ::</color>");
+        /*
         // do something with according to picked steer area
         /////////////////////////////////////////////////
         switch (pickedSteerArea)
@@ -76,7 +77,7 @@ public class LevelEndManager : MonoBehaviour
                 break;
         }
         ////////////////////////////////////////////////
-
+        */
         dampen = 15f;
         CanvasGroup cgGameView = HCFW.GameManager.Instance.MenuManager.gameView.gameObject.AddComponent<CanvasGroup>();
         cgGameView.alpha = 1f;

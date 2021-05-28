@@ -19,7 +19,7 @@ public class CarAiHelper : MonoBehaviour
         distanceTreshold = 20f;
     }
 
-    float timeDividerOnDonut = 1f;
+    public float timeDividerOnDonut = 1f;
     public void InitSelf(SteerArea picked)
     {
         switch (picked)
@@ -39,6 +39,7 @@ public class CarAiHelper : MonoBehaviour
             default:
                 break;
         }
+        this.enabled = true;
     }
 
     bool startDrift = false;
