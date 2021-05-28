@@ -19,22 +19,22 @@ public class CarAiHelper : MonoBehaviour
         distanceTreshold = 20f;
     }
 
-    public float timeDividerOnDonut = 1f;
+    public float timeoutOnDonut = 1f;
     public void InitSelf(SteerArea picked)
     {
         switch (picked)
         {
             case SteerArea.Green:
-                timeDividerOnDonut = 10f;
+                timeoutOnDonut = 5f;
                 break;
             case SteerArea.Orange:
-                timeDividerOnDonut = 6f;
+                timeoutOnDonut = 2.5f;
                 break;
             case SteerArea.Red:
-                timeDividerOnDonut = 6f;
+                timeoutOnDonut = 2.5f;
                 break;
             case SteerArea.Invalid:
-                timeDividerOnDonut = 2f;
+                timeoutOnDonut = 0.5f;
                 break;
             default:
                 break;
@@ -43,6 +43,7 @@ public class CarAiHelper : MonoBehaviour
     }
 
     bool startDrift = false;
+    float timeUntilDonutStops = 0f;
     private void Update()
     {
         Vector3 localTarget = trans.InverseTransformPoint(currentTarget.position);
@@ -71,18 +72,28 @@ public class CarAiHelper : MonoBehaviour
 
         if (startDrift)
         {
-            float speed = tcc.getMotor() - (Time.unscaledDeltaTime / timeDividerOnDonut);
-            if (speed < 0.0f) { speed = 0.0f; }
-            if (speed > 0f)
+            timeUntilDonutStops += Time.unscaledDeltaTime;
+            if (timeUntilDonutStops > timeoutOnDonut)
+            {
+                float speed = tcc.getMotor() - Time.unscaledDeltaTime;
+                if (speed < 0.0f) { speed = 0.0f; }
+                if (speed > 0f)
+                {
+                    tcc.setBoostMultiplier(2f);
+                    tcc.setSteering(1.5f);
+                }
+                else
+                {
+                    tcc.setBoostMultiplier(0f);
+                    tcc.setSteering(0f);
+                }
+                tcc.setMotor(speed);
+            } else
             {
                 tcc.setBoostMultiplier(2f);
                 tcc.setSteering(1.5f);
-            } else
-            {
-                tcc.setBoostMultiplier(0f);
-                tcc.setSteering(0f);
+                tcc.setMotor(1f);
             }
-            tcc.setMotor(speed);
 
         }
         else
