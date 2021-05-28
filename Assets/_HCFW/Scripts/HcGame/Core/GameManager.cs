@@ -111,6 +111,7 @@ namespace HCFW
         public float thirdEOLDelay;
 
         public bool noMoreTimeTriggerEntered = false;
+        public float timeInEOL;
 
         [Header("Steering setting")]
         public float defaultSteering = 250f;
@@ -322,6 +323,16 @@ namespace HCFW
 
             //Debug.Log("Body Local Rotation Vec3: " + tcc.body.transform.localRotation.eulerAngles);
 
+            if (isInTurn)
+            {
+                if (timeInEOL >= 0)
+                {
+                    timeInEOL -= 1 * Time.deltaTime;
+                    MenuManager.eolTimerText.text = timeInEOL.ToString("F1") + "s";
+                }
+            }
+
+
             if (steeringWheel == null)
             {
                 steeringWheel = FindObjectOfType<SteeringWheel>();
@@ -350,7 +361,7 @@ namespace HCFW
                 }
             }
 
-           
+
             if (tcc != null)
             {
                 // Displaying drift value and animating text
@@ -461,9 +472,12 @@ namespace HCFW
 
         public IEnumerator OnEnterCoroutine()
         {
+            timeInEOL = 1.7F;
             isInTurn = true;
+            MenuManager.eolTimerText.DOColor(Color.white, .5F);
+
             float startingRotationDamping = vcc.smoothFollowSettings.rotationDamping;
-          
+
             // move steering wheel & colored parts to the middle of screen
             MenuManager.orangePosition.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f, 0.5f);
             MenuManager.orangePosition.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f, 0.5f);
@@ -502,6 +516,7 @@ namespace HCFW
             // waiting for player input
             yield return new WaitUntil(() => PlayerPickedSteeringAngle());
 
+            MenuManager.eolTimerText.DOColor(Color.clear, .25F);
             MenuManager.orangePosition.DOFade(0f, .25f).SetUpdate(true);
             MenuManager.redPosition.DOFade(0f, .25f).SetUpdate(true);
             MenuManager.greenPosition.DOFade(0f, .25f).SetUpdate(true);
@@ -518,6 +533,30 @@ namespace HCFW
 
             // get the current steering area player was
             SteerArea pickedSteeringArea = steeringWheel.currentArea;
+            MenuManager.FallingConfettiFX(50);
+            MenuManager.eolTextEnd.transform.DOPunchScale(new Vector3(.25f, .25f, .25f), 1f, 1, 1f);
+            switch (pickedSteeringArea)
+            {
+                case SteerArea.Green:
+                    MenuManager.eolTextEnd.text = "PERFECT";
+                    MenuManager.eolTextEnd.DOColor(Color.green, .5F);
+
+                    break;
+                case SteerArea.Orange:
+                    MenuManager.eolTextEnd.text = "GOOD";
+                    MenuManager.eolTextEnd.DOColor(Color.yellow, .5F);
+                    break;
+                case SteerArea.Red:
+                    MenuManager.eolTextEnd.text = "GOOD";
+                    MenuManager.eolTextEnd.DOColor(Color.yellow, .5F);
+                    break;
+                case SteerArea.Invalid:
+                    MenuManager.eolTextEnd.text = "OK";
+                    MenuManager.eolTextEnd.DOColor(Color.white, .5F);
+                    break;
+                default:
+                    break;
+            }
 
             // go to EOL with steering area as param
             LevelEndManager.Instance.GoToEOL(pickedSteeringArea);
@@ -543,7 +582,7 @@ namespace HCFW
             enteredTrigger = false;
             */
 
-         
+
 
         }
 
@@ -661,6 +700,8 @@ namespace HCFW
 
             FetchConfetti();
             EnableDisableFountainConfetti(false);
+
+            MenuManager.eolTimerText.color = Color.clear;
         }
 
 

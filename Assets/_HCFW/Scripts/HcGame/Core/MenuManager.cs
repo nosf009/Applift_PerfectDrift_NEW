@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using NaughtyAttributes;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -72,6 +73,10 @@ namespace HCFW
         public Text tutorialText;
         public Image tutorialGreenImage;
 
+        [Header("EOL Text")]
+        public Text eolTextEnd;
+        public Text eolTimerText;
+
         [NaughtyAttributes.Button]
         public void PickGreenPosition(bool isLeft)
         {
@@ -105,6 +110,49 @@ namespace HCFW
                 float offset = Random.Range(-35f, -20f);
                 GenerateBoundaries(offset, -18f, .00000001f);
             }
+        }
+
+
+        [Header("Win particles FX")]
+        public Sprite Firework;
+        public Color[] colorsFX;
+        public Transform parent;
+
+        [Button]
+        public void FallingConfettiFX(int howManyParticles = 70)
+        {
+            RectTransform component = parent.GetComponent<RectTransform>();
+            for (int i = 0; i < howManyParticles; i++)
+            {
+                Image image = CreateImage(this.Firework, component);
+                image.color = colorsFX[UnityEngine.Random.Range(0, colorsFX.Length)];
+                image.transform.eulerAngles = new Vector3(0f, 0f, (float)UnityEngine.Random.Range(0, 360));
+                image.transform.localScale = new Vector2(UnityEngine.Random.Range(0.5f, 1f), UnityEngine.Random.Range(0.3f, 1f));
+                image.rectTransform.localPosition = new Vector2(UnityEngine.Random.Range(-component.rect.width / 2f, component.rect.width / 2f), component.rect.y + component.rect.height + 20f);
+                image.gameObject.SetActive(false);
+                float duration = UnityEngine.Random.Range(1f, 1.5f);
+                float delay = UnityEngine.Random.Range(0f, 1f);
+                image.transform.DORotate(new Vector3(0f, 0f, (float)UnityEngine.Random.Range(0, 360)), duration, RotateMode.Fast).SetEase(Ease.Linear).SetDelay(delay).OnStart(delegate
+                {
+                    image.gameObject.SetActive(true);
+                });
+                image.transform.DOLocalMoveY(component.rect.y - 20f, duration, false).SetDelay(delay).SetEase(Ease.Linear).OnComplete(delegate
+                {
+                    UnityEngine.Object.Destroy(image.gameObject);
+                });
+            }
+        }
+
+        public Image CreateImage(Sprite sprite, Transform parent)
+        {
+            GameObject gameObject = new GameObject();
+            gameObject.AddComponent<Image>();
+            gameObject.transform.SetParent(parent, false);
+            Image component = gameObject.GetComponent<Image>();
+            component.sprite = sprite;
+            component.SetNativeSize();
+            component.transform.localScale = Vector3.one;
+            return component;
         }
 
 
@@ -146,6 +194,12 @@ namespace HCFW
         private void Update()
         {
             //Debug.Log(steeringWheelImage.transform.rotation.eulerAngles);
+        
+        }
+
+        public void Start()
+        {
+            HCFW.GameManager.Instance.MenuManager.eolTextEnd.DOColor(Color.clear, 0F).Complete();
         }
 
         public void EnableView(Transform view) // simple enable/disable view. Due to it's simplicity it allows for various animation usage on menu gameObjects in hierarchy
