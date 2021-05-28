@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/_HCFW/___Scenes/HcGame/_HcSplash.unity
     guid: a91fd2c52b78cfa4cad18b3c53d91434
   - enabled: 0
-    path: Assets/_HCFW/___Scenes/HcGame/_HcGame.unity
+    path: Assets/_HCFW/___Scenes/HcGame/_HcGame_OLD.unity
     guid: 5ca2c67c6bde877448c04f36cf9a2bfa
   - enabled: 0
     path: 
