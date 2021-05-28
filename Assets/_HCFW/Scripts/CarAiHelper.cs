@@ -45,15 +45,27 @@ public class CarAiHelper : MonoBehaviour
                 startDrift = true;
             }
         }
-        tcc.setMotor(1f);
+
         if (startDrift)
         {
-            tcc.setBoostMultiplier(2f);
-            tcc.setSteering(1.5f);
-            
-        } else
+            float speed = tcc.getMotor() - Time.unscaledDeltaTime;
+            if (speed < 0.0f) { speed = 0.0f; }
+            if (speed > 0f)
+            {
+                tcc.setBoostMultiplier(2f);
+                tcc.setSteering(1.5f);
+            } else
+            {
+                tcc.setBoostMultiplier(0f);
+                tcc.setSteering(0f);
+            }
+            tcc.setMotor(speed);
+
+        }
+        else
         {
             tcc.setSteering(steer);
+            tcc.setMotor(1f);
             //float speed = tcc.getMotor() - Time.unscaledDeltaTime;
             //if (speed < 0.7f) { speed = 0.7f; }
             //tcc.setMotor(speed);
