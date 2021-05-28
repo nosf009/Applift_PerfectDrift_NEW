@@ -16,6 +16,7 @@ public class CarAiHelper : MonoBehaviour
         tcc = GetComponentInChildren<TinyCarController>();
         trans = transform.GetChild(0).GetChild(0);
         currentTarget = LevelEndManager.Instance.moveToThisTransform;
+        distanceTreshold = 20f;
     }
 
     bool startDrift = false;
