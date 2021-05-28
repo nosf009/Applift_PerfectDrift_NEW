@@ -498,6 +498,9 @@ namespace HCFW
             Debug.Log("Player can now input steering wheel");
             canPlayerInput = true;
             MenuManager.steeringWheelImage.color = Color.white;
+            LevelEndManager.Instance.moveToThisTransform = GameObject.FindGameObjectWithTag("DOTweenPath").transform;
+            HCFW.GameManager.Instance.tcv.GetComponent<LeanTinyInput>().enabled = false;
+            HCFW.GameManager.Instance.tcv.GetComponent<CarAiHelper>().enabled = true; // init self (also activate)
 
             // waiting for player input
             yield return new WaitUntil(() => PlayerPickedSteeringAngle());

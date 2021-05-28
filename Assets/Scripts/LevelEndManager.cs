@@ -36,6 +36,7 @@ public class LevelEndManager : MonoBehaviour
     {
         GameManager.Instance.WinGameAtCurrentLevel();
         GameManager.Instance.state = GameState.InEOL;
+        HCFW.GameManager.Instance.tcv.GetComponent<CarAiHelper>().InitSelf(pickedSteerArea);
         StartCoroutine(StartEOL(pickedSteerArea));
     }
 
@@ -82,9 +83,9 @@ public class LevelEndManager : MonoBehaviour
         CanvasGroup cgGameView = HCFW.GameManager.Instance.MenuManager.gameView.gameObject.AddComponent<CanvasGroup>();
         cgGameView.alpha = 1f;
         cgGameView.DOFade(0f, 1f);
-        moveToThisTransform = GameObject.FindGameObjectWithTag("DOTweenPath").transform;
-        HCFW.GameManager.Instance.tcv.GetComponent<LeanTinyInput>().enabled = false;
-        HCFW.GameManager.Instance.tcv.GetComponent<CarAiHelper>().InitSelf(pickedSteerArea); // init self (also activate)
+        //moveToThisTransform = GameObject.FindGameObjectWithTag("DOTweenPath").transform;
+        //HCFW.GameManager.Instance.tcv.GetComponent<LeanTinyInput>().enabled = false;
+        //HCFW.GameManager.Instance.tcv.GetComponent<CarAiHelper>().InitSelf(pickedSteerArea); // init self (also activate)
         DOTween.To(() => GameManager.Instance.vcc.smoothFollowSettings.distance, x => GameManager.Instance.vcc.smoothFollowSettings.distance = x, 55f, 2f).SetUpdate(true);
         DOTween.To(() => GameManager.Instance.vcc.smoothFollowSettings.height, x => GameManager.Instance.vcc.smoothFollowSettings.height = x, 25f, 2f).SetUpdate(true);
         yield return new WaitForSecondsRealtime(GameManager.Instance.firstEOLDelay);
