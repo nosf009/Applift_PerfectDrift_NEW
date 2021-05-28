@@ -28,13 +28,55 @@ public class LevelEndManager : MonoBehaviour
     public void OnPlayerEnteredWinTrigger()
     {
         if (GameManager.Instance.state != HCFW.GameState.InGame) return;
-        GameManager.Instance.WinGameAtCurrentLevel();
-        GameManager.Instance.state = GameState.InEOL;
-        StartCoroutine(StartEOL());
+        ActivateSteeringWheelSpecial(); // activate the steering wheel & slowmo
     }
 
-    public IEnumerator StartEOL()
+    // this goes to the EOL coroutine, where the player car drifts etc
+    public void GoToEOL(SteerArea pickedSteerArea)
     {
+        GameManager.Instance.WinGameAtCurrentLevel();
+        GameManager.Instance.state = GameState.InEOL;
+        StartCoroutine(StartEOL(pickedSteerArea));
+    }
+
+
+    public void ActivateSteeringWheelSpecial()
+    {
+
+        // generating the green position and the others, either left or right
+        if(UnityEngine.Random.value < 0.5f)
+        {
+            HCFW.GameManager.Instance.MenuManager.PickGreenPosition(true);
+        }
+        else
+        {
+            HCFW.GameManager.Instance.MenuManager.PickGreenPosition(false);
+        }
+        // start the coroutine for the steering wheel to appear
+        HCFW.GameManager.Instance.OnEnterTurnTrigger();
+    }
+
+    public IEnumerator StartEOL(SteerArea pickedSteerArea)
+    {
+
+        Debug.Log("::<Color=White> Player picked " + pickedSteerArea.ToString() +  " ::</color>");
+        // do something with according to picked steer area
+        /////////////////////////////////////////////////
+        switch (pickedSteerArea)
+        {
+            case SteerArea.Green:
+                break;
+            case SteerArea.Orange:
+                break;
+            case SteerArea.Red:
+                break;
+            case SteerArea.Invalid:
+                break;
+            default:
+                break;
+        }
+        ////////////////////////////////////////////////
+
         dampen = 15f;
         CanvasGroup cgGameView = HCFW.GameManager.Instance.MenuManager.gameView.gameObject.AddComponent<CanvasGroup>();
         cgGameView.alpha = 1f;

@@ -26,6 +26,7 @@ public class TurnTrigger : MonoBehaviour
 
     public void OnTriggerEnter(Collider other)
     {
+        /*
         if (other.gameObject.CompareTag("Player"))
         {
 
@@ -52,7 +53,7 @@ public class TurnTrigger : MonoBehaviour
                 }
             }
 
-        }
+        }*/
 
     }
 }
