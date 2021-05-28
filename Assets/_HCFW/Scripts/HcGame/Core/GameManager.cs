@@ -461,6 +461,21 @@ namespace HCFW
             isInTurn = true;
             float startingRotationDamping = vcc.smoothFollowSettings.rotationDamping;
 
+            /*
+            MenuManager.redPosition.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 0f);
+            MenuManager.greenPosition.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 0f);
+            MenuManager.steeringWheelImage.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 0f);
+            */
+
+            MenuManager.steeringWheelImage.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f, 0.5f);
+            MenuManager.steeringWheelImage.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f, 0.5f);
+
+
+            MenuManager.orangePosition.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 0f);
+            MenuManager.redPosition.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 0f);
+            MenuManager.greenPosition.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 0f);
+            MenuManager.steeringWheelImage.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 0f);
+
             yield return new WaitForSecondsRealtime(startSequenceDelay);
 
             //TinyCarSurfaceParameters tcsp = tcc.surfaceParameters;
@@ -481,8 +496,13 @@ namespace HCFW
             canPlayerInput = true;
             MenuManager.steeringWheelImage.color = Color.white;
             yield return new WaitUntil(() => ReceivedPlayerInputOnTurn());
-            //vcc.smoothFollowSettings.followVelocity = true;
-            //steerValueThatWasSet = joystick.ScaledValue.x;
+
+
+            MenuManager.orangePosition.DOFade(0f, .25f).SetUpdate(true);
+            MenuManager.redPosition.DOFade(0f, .25f).SetUpdate(true);
+            MenuManager.greenPosition.DOFade(0f, .25f).SetUpdate(true);
+            MenuManager.steeringWheelImage.DOFade(0f, .25f).SetUpdate(true);
+
             SteerArea currentAreaThatPlayerWasIn = steeringWheel.currentArea;
 
             if (turnSlider != null)
@@ -579,6 +599,9 @@ namespace HCFW
             //MenuManager.steeringWheelImage.color = Color.clear;
             yield return new WaitForSecondsRealtime(.5f);
             canIncreaseSlider = true;
+
+
+         
 
         }
 
