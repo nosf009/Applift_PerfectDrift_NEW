@@ -19,6 +19,28 @@ public class CarAiHelper : MonoBehaviour
         distanceTreshold = 20f;
     }
 
+    float timeDividerOnDonut = 1f;
+    public void InitSelf(SteerArea picked)
+    {
+        switch (picked)
+        {
+            case SteerArea.Green:
+                timeDividerOnDonut = 10f;
+                break;
+            case SteerArea.Orange:
+                timeDividerOnDonut = 6f;
+                break;
+            case SteerArea.Red:
+                timeDividerOnDonut = 6f;
+                break;
+            case SteerArea.Invalid:
+                timeDividerOnDonut = 2f;
+                break;
+            default:
+                break;
+        }
+    }
+
     bool startDrift = false;
     private void Update()
     {
@@ -48,7 +70,7 @@ public class CarAiHelper : MonoBehaviour
 
         if (startDrift)
         {
-            float speed = tcc.getMotor() - Time.unscaledDeltaTime;
+            float speed = tcc.getMotor() - (Time.unscaledDeltaTime / timeDividerOnDonut);
             if (speed < 0.0f) { speed = 0.0f; }
             if (speed > 0f)
             {
