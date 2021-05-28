@@ -472,7 +472,7 @@ namespace HCFW
 
         public IEnumerator OnEnterCoroutine()
         {
-            timeInEOL = 1.7F;
+            timeInEOL = 2.2F;
             isInTurn = true;
             MenuManager.eolTimerText.DOColor(Color.white, .5F);
 
