@@ -8,13 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_HCFW/___Scenes/HcGame/_HcSplash.unity
     guid: a91fd2c52b78cfa4cad18b3c53d91434
-  - enabled: 0
-    path: Assets/_HCFW/___Scenes/HcGame/_HcGame_OLD.unity
-    guid: 5ca2c67c6bde877448c04f36cf9a2bfa
-  - enabled: 0
-    path: Assets/_HCFW/___Scenes/HcGame/_HcGame Romano.unity
-    guid: f597bc8a0c93e2d4f877b5b283014bce
   - enabled: 1
-    path: Assets/_HCFW/___Scenes/HcGame/_HcGame.unity
-    guid: 20057d4622e9bf54c8d2141ecd0d4c21
+    path: Assets/_HCFW/___Scenes/HcGame/_HcGame ALEN.unity
+    guid: 21945f9ce71c40b4089973682acd257a
   m_configObjects: {}
