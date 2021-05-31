@@ -5,10 +5,12 @@ using UnityEngine.SceneManagement;
 
 public class Preload : MonoBehaviour {
 
+	public float preloadTime = 1.5f;
+
 	// Use this for initialization
 	IEnumerator Start () {
 
-		yield return new WaitForSeconds (1f);
+		yield return new WaitForSeconds (preloadTime);
 		SceneManager.LoadScene (1);
 
 	}
