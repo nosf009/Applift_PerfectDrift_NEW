@@ -23,6 +23,8 @@ public class LevelEndManager : MonoBehaviour
 
     public Transform moveToThisTransform;
     public bool smoothRot = false;
+    public bool smoothFollow = false;
+    public Transform moveEnd;
     private float dampen;
 
     public void OnPlayerEnteredWinTrigger()
@@ -81,28 +83,37 @@ public class LevelEndManager : MonoBehaviour
         */
 
         HCFW.GameManager.Instance.MenuManager.eolTextEnd.DOColor(Color.clear, .5F).SetDelay(2.5F);
-        dampen = 15f;
+        dampen = 8f;
         CanvasGroup cgGameView = HCFW.GameManager.Instance.MenuManager.gameView.gameObject.AddComponent<CanvasGroup>();
         cgGameView.alpha = 1f;
         cgGameView.DOFade(0f, 1f);
         //moveToThisTransform = GameObject.FindGameObjectWithTag("DOTweenPath").transform;
         //HCFW.GameManager.Instance.tcv.GetComponent<LeanTinyInput>().enabled = false;
         //HCFW.GameManager.Instance.tcv.GetComponent<CarAiHelper>().InitSelf(pickedSteerArea); // init self (also activate)
-        DOTween.To(() => GameManager.Instance.vcc.smoothFollowSettings.distance, x => GameManager.Instance.vcc.smoothFollowSettings.distance = x, 55f, 2f).SetUpdate(true);
-        DOTween.To(() => GameManager.Instance.vcc.smoothFollowSettings.height, x => GameManager.Instance.vcc.smoothFollowSettings.height = x, 25f, 2f).SetUpdate(true);
-        yield return new WaitForSecondsRealtime(GameManager.Instance.firstEOLDelay);
+        DOTween.To(() => GameManager.Instance.vcc.smoothFollowSettings.distance, x => GameManager.Instance.vcc.smoothFollowSettings.distance = x, 60f, 1f).SetUpdate(true);
+        DOTween.To(() => GameManager.Instance.vcc.smoothFollowSettings.height, x => GameManager.Instance.vcc.smoothFollowSettings.height = x, 30f, 1f).SetUpdate(true);
+        yield return new WaitForSecondsRealtime(1f);
 
-        Transform moveEnd = GameObject.FindGameObjectWithTag("EndCam").transform;
+        moveEnd = GameObject.FindGameObjectWithTag("EndCam").transform;
         yield return new WaitForSecondsRealtime(1f);
         GameManager.Instance.vcc.enabled = false;
+        smoothFollow = true;
+        //GameManager.Instance.gameCamera.transform.DOMove(moveEnd.transform.position, .8f).SetUpdate(true).SetEase(Ease.InOutSine);
+        List<Vector3> path = new List<Vector3>();
+        path.Add(GameManager.Instance.gameCamera.transform.position /*- new Vector3(0f, 1f, 0f)*/);
+        //path.Add(GameManager.Instance.tcv.vehicleBody.position + new Vector3(0f, 3f, 0f));
+        path.Add(moveEnd.position);
+        GameManager.Instance.gameCamera.transform.DOPath(path.ToArray(), 2.5f, PathType.CatmullRom, PathMode.Full3D).SetUpdate(true).SetEase(Ease.OutSine);
+        yield return new WaitForSecondsRealtime(.3f);
         smoothRot = true;
-        GameManager.Instance.gameCamera.transform.DOMove(moveEnd.transform.position, 1f).SetUpdate(true).SetEase(Ease.InOutSine);
-        yield return new WaitForSecondsRealtime(1f);
+        yield return new WaitForSecondsRealtime(.7f);
         GameManager.Instance.state = GameState.FinishedEOL;
         smoothRot = false;
-        GameManager.Instance.gameCamera.transform.DORotate(moveEnd.transform.rotation.eulerAngles, 2f).SetUpdate(true).SetEase(Ease.OutSine);
+        GameManager.Instance.gameCamera.transform.DORotate(moveEnd.transform.rotation.eulerAngles, 1.75f).SetUpdate(true).SetEase(Ease.OutSine);
+        /*
         yield return new WaitForSecondsRealtime(GameManager.Instance.thirdEOLDelay);
         GameManager.Instance.MenuManager.EnableView(GameManager.Instance.MenuManager.winView);
+        */
     }
 
 
@@ -117,10 +128,10 @@ public class LevelEndManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+     
     }
 
-    public void LateUpdate()
+    private void FixedUpdate()
     {
         var rotation = Quaternion.LookRotation(HCFW.GameManager.Instance.vcc.target.position - HCFW.GameManager.Instance.gameCamera.transform.position);
         var rotation2 = Quaternion.Slerp(HCFW.GameManager.Instance.gameCamera.transform.rotation, rotation, Time.deltaTime * dampen);
@@ -128,5 +139,13 @@ public class LevelEndManager : MonoBehaviour
         {
             GameManager.Instance.gameCamera.transform.rotation = rotation2;
         }
+    }
+
+    public void LateUpdate()
+    {
+       
+
+
+
     }
 }

@@ -76,6 +76,7 @@ namespace HCFW
         [Header("EOL Text")]
         public Text eolTextEnd;
         public Text eolTimerText;
+        public Text donutsCountsText;
 
         [NaughtyAttributes.Button]
         public void PickGreenPosition(bool isLeft)
@@ -194,12 +195,13 @@ namespace HCFW
         private void Update()
         {
             //Debug.Log(steeringWheelImage.transform.rotation.eulerAngles);
-        
+
         }
 
         public void Start()
         {
             HCFW.GameManager.Instance.MenuManager.eolTextEnd.DOColor(Color.clear, 0F).Complete();
+            GameManager.Instance.MenuManager.donutsCountsText.color = Color.clear;
         }
 
         public void EnableView(Transform view) // simple enable/disable view. Due to it's simplicity it allows for various animation usage on menu gameObjects in hierarchy
@@ -210,6 +212,8 @@ namespace HCFW
             winView.gameObject.SetActive(false);
             failView.gameObject.SetActive(false);
             settingsView.gameObject.SetActive(false);
+
+
             if (shopView != null)
             {
                 shopView.gameObject.SetActive(false);

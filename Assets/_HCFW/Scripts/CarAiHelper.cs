@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DavidJalbert;
+using HCFW;
 
 public class CarAiHelper : MonoBehaviour
 {
@@ -44,6 +45,9 @@ public class CarAiHelper : MonoBehaviour
 
     bool startDrift = false;
     float timeUntilDonutStops = 0f;
+    public bool justOnce = false;
+
+
     private void Update()
     {
         Vector3 localTarget = trans.InverseTransformPoint(currentTarget.position);
@@ -52,7 +56,7 @@ public class CarAiHelper : MonoBehaviour
         float steer = Mathf.Clamp((targetAngle / tcc.maxSteering), -1f, 1f); // / 100;
 
         //tcc.setBoostMultiplier(3f);
-        
+
         Vector3 directionToTarget = currentTarget.transform.position - trans.position;
         float dSqrToTarget = directionToTarget.sqrMagnitude;
         //Debug.Log(dSqrToTarget);
@@ -63,7 +67,8 @@ public class CarAiHelper : MonoBehaviour
             {
                 Debug.Log("ksfksdfskfdf");
                 currentTarget = GameObject.FindGameObjectWithTag("EolTarget").transform;
-            } else
+            }
+            else
             {
                 Debug.Log("startDrift = true;");
                 startDrift = true;
@@ -76,23 +81,42 @@ public class CarAiHelper : MonoBehaviour
             if (timeUntilDonutStops > timeoutOnDonut)
             {
                 float speed = tcc.getMotor() - Time.unscaledDeltaTime;
+
                 if (speed < 0.0f) { speed = 0.0f; }
                 if (speed > 0f)
                 {
                     tcc.setBoostMultiplier(2f);
                     tcc.setSteering(1.5f);
+
                 }
                 else
                 {
                     tcc.setBoostMultiplier(0f);
                     tcc.setSteering(0f);
+
+                    if (justOnce == false)
+                    {
+                        justOnce = true;
+                        GameManager.Instance.MenuManager.donutsCountsText.gameObject.SetActive(false);
+                        GameManager.Instance.MenuManager.EnableView(GameManager.Instance.MenuManager.winView);
+                    }
+
+                    //Debug.Log("ENDERINOOOOO");
                 }
                 tcc.setMotor(speed);
-            } else
+            }
+            else
             {
                 tcc.setBoostMultiplier(2f);
                 tcc.setSteering(1.5f);
                 tcc.setMotor(1f);
+
+                GameManager.Instance.donutCounts += .5f * Time.deltaTime;
+                if (GameManager.Instance.MenuManager.donutsCountsText != null)
+                {
+                    GameManager.Instance.MenuManager.donutsCountsText.text = "DONUTS x" + GameManager.Instance.donutCounts.ToString("F0");
+                    GameManager.Instance.MenuManager.donutsCountsText.color = Color.white;
+                }
             }
 
         }
