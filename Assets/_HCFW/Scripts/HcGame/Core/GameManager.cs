@@ -688,7 +688,7 @@ namespace HCFW
             adCooldown = isFirstSession ? firstSession_ShowNewAdCooldown : general_ShowNewAdCooldown;
 
             MenuManager.restartButton.onClick.RemoveAllListeners();
-            MenuManager.restartButton.onClick.AddListener(ReloadScene);
+            MenuManager.restartButton.onClick.AddListener(ReloadSceneDelayed);
             tcc = FindObjectOfType<TinyCarController>();
             tcv = FindObjectOfType<TinyCarVisuals>();
             carAudio = FindObjectOfType<CarAudio>();
@@ -935,6 +935,17 @@ namespace HCFW
                                                                    // there is no score property in PlayerGameProfile anyway
             }
             MenuManager.UpdateMainMenuLabels();
+        }
+
+        public void ReloadSceneDelayed()
+        {
+            StartCoroutine(ReloadDelayed());
+        }
+
+        public IEnumerator ReloadDelayed()
+        {
+            yield return new WaitForSeconds(1f);
+            ReloadScene();
         }
 
         public void ReloadScene()
