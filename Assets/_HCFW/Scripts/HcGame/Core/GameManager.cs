@@ -110,6 +110,9 @@ namespace HCFW
         public float secondEOLDelay;
         public float thirdEOLDelay;
 
+        public bool noMoreTimeTriggerEntered = false;
+        public float timeInEOL;
+
         [Header("Steering setting")]
         public float defaultSteering = 250f;
         public float driftSteering = 175f;
@@ -235,7 +238,6 @@ namespace HCFW
 
         }
 
-
         public List<GameObject> fountainConfetti = new List<GameObject>();
         public List<GameObject> explodeConfetti = new List<GameObject>();
 
@@ -276,7 +278,7 @@ namespace HCFW
             {
                 if (currentDriftValue >= 100f)
                 {
-                    Debug.Log("Enable ADDITIONAL BOOST");
+                    //Debug.Log("Enable ADDITIONAL BOOST");
                     driftBoostEnabled = true;
                     StartCoroutine(IncreaseBoost());
 
@@ -321,6 +323,16 @@ namespace HCFW
 
             //Debug.Log("Body Local Rotation Vec3: " + tcc.body.transform.localRotation.eulerAngles);
 
+            if (isInTurn)
+            {
+                if (timeInEOL >= 0)
+                {
+                    timeInEOL -= 1 * Time.deltaTime;
+                    MenuManager.eolTimerText.text = timeInEOL.ToString("F1") + "s";
+                }
+            }
+
+
             if (steeringWheel == null)
             {
                 steeringWheel = FindObjectOfType<SteeringWheel>();
@@ -349,7 +361,7 @@ namespace HCFW
                 }
             }
 
-           
+
             if (tcc != null)
             {
                 // Displaying drift value and animating text
@@ -419,14 +431,14 @@ namespace HCFW
         }
 
 
-        public void OnEnterTurnTrigger(float duration, float multiplier)
+        public void OnEnterTurnTrigger()
         {
             Debug.Log("<Color=Cyan>Player entered turn trigger!</color>");
 
             if (!enteredTrigger)
             {
                 enteredTrigger = true;
-                StartCoroutine(OnEnterCoroutine(duration, multiplier));
+                StartCoroutine(OnEnterCoroutine());
             }
 
         }
@@ -440,9 +452,9 @@ namespace HCFW
 
 
 
-        public bool ReceivedPlayerInputOnTurn()
+        public bool PlayerPickedSteeringAngle()
         {
-            if (canPlayerInput && receivedInputForTurn)
+            if ((canPlayerInput && receivedInputForTurn) || noMoreTimeTriggerEntered)
             {
                 return true;
             }
@@ -454,17 +466,37 @@ namespace HCFW
 
         float lastTurnDuration = 0f;
         float lastTurnMultiplier = 1f;
-        public IEnumerator OnEnterCoroutine(float duration, float multiplier)
+
+
+        public float timeInCoroutine = 0f;
+
+        public IEnumerator OnEnterCoroutine()
         {
-            lastTurnMultiplier = multiplier;
-            lastTurnDuration = duration;
+            timeInEOL = 2.2F;
             isInTurn = true;
+            MenuManager.eolTimerText.DOColor(Color.white, .5F);
+
             float startingRotationDamping = vcc.smoothFollowSettings.rotationDamping;
 
-            yield return new WaitForSecondsRealtime(startSequenceDelay);
+            // move steering wheel & colored parts to the middle of screen
+            MenuManager.orangePosition.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f, 0.5f);
+            MenuManager.orangePosition.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f, 0.5f);
 
-            //TinyCarSurfaceParameters tcsp = tcc.surfaceParameters;
-            //tcc.surfaceParameters = parametersToSetUponEntering;
+            MenuManager.redPosition.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f, 0.5f);
+            MenuManager.redPosition.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f, 0.5f);
+
+            MenuManager.greenPosition.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f, 0.5f);
+            MenuManager.greenPosition.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f, 0.5f);
+
+            MenuManager.steeringWheelImage.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f, 0.5f);
+            MenuManager.steeringWheelImage.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f, 0.5f);
+
+            MenuManager.orangePosition.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 0f);
+            MenuManager.redPosition.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 0f);
+            MenuManager.greenPosition.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 0f);
+            MenuManager.steeringWheelImage.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 0f);
+
+            yield return new WaitForSecondsRealtime(startSequenceDelay);
 
             MenuManager.greenPosition.color = Color.green;
             MenuManager.redPosition.color = Color.red;
@@ -480,82 +512,62 @@ namespace HCFW
             Debug.Log("Player can now input steering wheel");
             canPlayerInput = true;
             MenuManager.steeringWheelImage.color = Color.white;
-            yield return new WaitUntil(() => ReceivedPlayerInputOnTurn());
-            //vcc.smoothFollowSettings.followVelocity = true;
-            //steerValueThatWasSet = joystick.ScaledValue.x;
-            SteerArea currentAreaThatPlayerWasIn = steeringWheel.currentArea;
+            LevelEndManager.Instance.moveToThisTransform = GameObject.FindGameObjectWithTag("DOTweenPath").transform;
+            HCFW.GameManager.Instance.tcv.GetComponent<LeanTinyInput>().enabled = false;
+            HCFW.GameManager.Instance.tcv.GetComponent<CarAiHelper>().enabled = true; // init self (also activate)
 
-            if (turnSlider != null)
-            {
-                steerValueThatWasSet *= multiplier;
-            }
-            else
-            {
-                switch (currentAreaThatPlayerWasIn)
-                {
-                    case SteerArea.Green:
-                        if (joystick.ScaledValue.x > 0.01f)
-                        {
-                            steerValueThatWasSet = 1f;
-                        }
-                        else
-                        {
-                            steerValueThatWasSet = -1f;
-                        }
-                        break;
-                    case SteerArea.Orange:
-                        if (joystick.ScaledValue.x > 0.01f)
-                        {
-                            steerValueThatWasSet = .65f;
-                        }
-                        else
-                        {
-                            steerValueThatWasSet = -.65f;
-                        }
-                        break;
-                    case SteerArea.Red:
-                        if (joystick.ScaledValue.x > 0.01f)
-                        {
-                            steerValueThatWasSet = 1.35f;
-                        }
-                        else
-                        {
-                            steerValueThatWasSet = -1.35f;
-                        }
-                        break;
-                    default:
-                        break;
-                }
+            // waiting for player input
+            yield return new WaitUntil(() => PlayerPickedSteeringAngle());
 
-                /*
-                if (joystick.ScaledValue.x > 0.01f)
-                {
-                    steerValueThatWasSet = 1f;
-                }
-                else
-                {
-                    steerValueThatWasSet = -1f;
-                }*/
+            MenuManager.eolTimerText.DOColor(Color.clear, .25F);
+            MenuManager.orangePosition.DOFade(0f, .25f).SetUpdate(true);
+            MenuManager.redPosition.DOFade(0f, .25f).SetUpdate(true);
+            MenuManager.greenPosition.DOFade(0f, .25f).SetUpdate(true);
+            MenuManager.steeringWheelImage.DOFade(0f, .25f).SetUpdate(true);
 
-                /*
-                //steerValueThatWasSet = joystick.ScaledValue.x;
-                */
-            }
+            Debug.Log("Fading out UI because PlayerPickedSteeringAngle() return true");
 
+            // return timescale to normal
             DOTween.To(() => Time.timeScale, x => Time.timeScale = x, globalTimeScale, enteringSlowmoTime).SetUpdate(true);
-
-
-            Debug.Log("Player Steered to value X: " + steerValueThatWasSet);
-
-            /////////////////////////////////////////////////////////
-            // AFTER TIME RUNS OUT FROM ENTERING TRIGGER COLLIDER //
-            ///////////////////////////////////////////////////////
 
             MenuManager.greenPosition.color = Color.clear;
             MenuManager.orangePosition.color = Color.clear;
             MenuManager.redPosition.color = Color.clear;
+
+            // get the current steering area player was
+            SteerArea pickedSteeringArea = steeringWheel.currentArea;
+            MenuManager.FallingConfettiFX(50);
+            MenuManager.eolTextEnd.transform.DOPunchScale(new Vector3(.25f, .25f, .25f), 1f, 1, 1f);
+            switch (pickedSteeringArea)
+            {
+                case SteerArea.Green:
+                    MenuManager.eolTextEnd.text = "PERFECT";
+                    MenuManager.eolTextEnd.DOColor(Color.green, .5F);
+
+                    break;
+                case SteerArea.Orange:
+                    MenuManager.eolTextEnd.text = "GOOD";
+                    MenuManager.eolTextEnd.DOColor(Color.yellow, .5F);
+                    break;
+                case SteerArea.Red:
+                    MenuManager.eolTextEnd.text = "GOOD";
+                    MenuManager.eolTextEnd.DOColor(Color.yellow, .5F);
+                    break;
+                case SteerArea.Invalid:
+                    MenuManager.eolTextEnd.text = "OK";
+                    MenuManager.eolTextEnd.DOColor(Color.white, .5F);
+                    break;
+                default:
+                    break;
+            }
+
+            // go to EOL with steering area as param
+            LevelEndManager.Instance.GoToEOL(pickedSteeringArea);
+
+            /*
             ////////////////////////////////////////////////////// FIRST HALF
-            float newTime = duration * percentOfDurationWhenWeSwitchCameraSettingsBackToNormal; // % of duration
+            ///
+            float newTime = 1f;
             yield return new WaitForSeconds(newTime);
 
             DOTween.To(() => vcc.smoothFollowSettings.rotationDamping, x => vcc.smoothFollowSettings.rotationDamping = x, defaultCameraRotationDampening, newTime).SetUpdate(true);
@@ -565,20 +577,15 @@ namespace HCFW
 
 
             ////////////////////////////////////////////////////// SECOND HALF
-            yield return new WaitForSeconds(duration - newTime);
-
-            steerValueThatWasSet = -steerValueThatWasSet;
-            yield return new WaitForSecondsRealtime(.17f);
+            yield return new WaitForSeconds(.5f);
             // reset everything here
             receivedInputForTurn = false;
             canPlayerInput = false;
-            //vcc.smoothFollowSettings.followVelocity = false;
             isInTurn = false;
-            steerValueThatWasSet = 0f;
             enteredTrigger = false;
-            //MenuManager.steeringWheelImage.color = Color.clear;
-            yield return new WaitForSecondsRealtime(.5f);
-            canIncreaseSlider = true;
+            */
+
+
 
         }
 
@@ -696,6 +703,8 @@ namespace HCFW
 
             FetchConfetti();
             EnableDisableFountainConfetti(false);
+
+            MenuManager.eolTimerText.color = Color.clear;
         }
 
 
@@ -812,7 +821,7 @@ namespace HCFW
         [NaughtyAttributes.Button]
         public void ResetCarToPoint()
         {
-            StartCoroutine(ResetCoroutine());
+            //StartCoroutine(ResetCoroutine());
         }
 
         public IEnumerator ResetCoroutine()

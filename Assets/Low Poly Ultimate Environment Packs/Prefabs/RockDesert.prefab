@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4162021947749836438}
   - component: {fileID: 630297394849363969}
   m_Layer: 0
-  m_Name: GeoSphere063
+  m_Name: RockDesert
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -59,7 +59,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -7967597685432796875, guid: cd87933700c344ae5be431520b1933f7, type: 3}
+  - {fileID: 2100000, guid: ec36f07b96d50dc4eb560fdaf163d8d5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
