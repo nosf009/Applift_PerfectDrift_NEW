@@ -113,6 +113,8 @@ namespace HCFW
         public bool noMoreTimeTriggerEntered = false;
         public float timeInEOL;
 
+        public float donutCounts;
+
         [Header("Steering setting")]
         public float defaultSteering = 250f;
         public float driftSteering = 175f;
@@ -592,6 +594,13 @@ namespace HCFW
         public IEnumerator TutorialCoroutine(float duration, TurnTriggerDir dir, float enterDelay)
         {
 
+            bool finishedTimer = false;
+            float timer1 = 0f;
+            DOTween.To(() => timer1, x => timer1 = x, 2f, 2f).SetEase(Ease.Linear).SetUpdate(true).OnComplete(() =>
+            {
+                finishedTimer = true;
+            });
+
             if (dir == TurnTriggerDir.Left)
             {
                 MenuManager.tutorialGreenImage.transform.DORotate(new Vector3(0F, 0F, 90F), .5F).Complete();
@@ -614,11 +623,11 @@ namespace HCFW
             if (dir == TurnTriggerDir.Left)
             {
 
-                yield return new WaitUntil(() => steeringWheel.zValue >= 65f && steeringWheel.zValue <= 91f);
+                yield return new WaitUntil(() => (steeringWheel.zValue >= 65f && steeringWheel.zValue <= 91f) || finishedTimer);
             }
             else
             {
-                yield return new WaitUntil(() => steeringWheel.zValue <= -65f && steeringWheel.zValue >= -91f);
+                yield return new WaitUntil(() => (steeringWheel.zValue <= -65f && steeringWheel.zValue >= -91f) || finishedTimer);
             }
 
             MenuManager.tutorialText.text = "";
@@ -795,6 +804,7 @@ namespace HCFW
             LevelManager.current = LevelManager.Current;
             LevelManager.current.gameObject.SetActive(true);
             // main difference is: inGame is still FALSE here
+            donutCounts = -0.475f;
 
             FindObjectOfType<LeanTinyInput>().InitLeanTinyInput();
             gameCamera.GetComponent<VehicleCameraController>().target = FindObjectOfType<TinyCarVisuals>().vehicleContainer;
